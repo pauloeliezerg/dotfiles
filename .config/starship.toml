@@ -1,3 +1,27 @@
+format = '''
+$username @ $hostname$all$fill$cmd_duration $jobs $time$line_break[\$](bold fg:#689d6a) '''
+
+add_newline = false
+
+[username]
+show_always = true
+format = "[$user]($style)"
+style_user = "bold fg:#cc241d"
+
+[character]
+disabled = true
+
+[fill]
+style = "bold fg:#689d6a"
+
+[cmd_duration]
+format = 'took [$duration]($style) '
+style = "bold fg:#458588"
+
+[time]
+disabled = false
+style = "bold fg:#d65d0e"
+
 [aws]
 symbol = "  "
 
@@ -15,6 +39,7 @@ symbol = " "
 
 [directory]
 read_only = " 󰌾"
+style = "bold fg:#458588"
 
 [docker_context]
 symbol = " "
@@ -47,7 +72,10 @@ symbol = " "
 symbol = " "
 
 [hostname]
+format = "[$ssh_symbol$hostname]($style) in "
+ssh_only = false
 ssh_symbol = " "
+style = "bold fg:#d65d0e"
 
 [java]
 symbol = " "
