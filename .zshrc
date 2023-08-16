@@ -4,6 +4,12 @@ HISTSIZE=1000
 SAVEHIST=1000
 bindkey -e
 
+# delete, alt + delete, home and end keys remap
+bindkey "^[[3~" delete-char
+bindkey "^[[3;3~" delete-word
+bindkey  "^[[H"   beginning-of-line
+bindkey  "^[[F"   end-of-line
+
 # plugins
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
