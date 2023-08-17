@@ -133,30 +133,18 @@ button,
 
 #cpu,
 #memory,
-#temperature {
+#temperature,
+#pulseaudio.source,
+#pulseaudio.sink {
     color: #d5c4a1;
     box-shadow: inset 0 -2px #8ec07c;
     min-width: 70px;
 }
 
-#pulseaudio {
-    color: #d5c4a1;
-    box-shadow: inset 0 -2px #fb4934;
-}
-
-#pulseaudio.muted {
-    background-color: #7c6f64;
+#pulseaudio.source.source-muted,
+#pulseaudio.sink.muted {
     color: #7c6f64;
-}
-
-#pulseaudio.warning {
-    color: #d5c4a1;
-    box-shadow: inset 0 -2px #8ec07c;
-}
-
-#pulseaudio.critical {
-    color: #d5c4a1;
-    box-shadow: inset 0 -2px #fabd2f;
+    box-shadow: inset 0 -2px #7c6f64;
 }
 
 #cpu.warning,
@@ -171,8 +159,4 @@ button,
 #temperature.critical {
     color: #d5c4a1;
     box-shadow: inset 0 -2px #fb4934;
-}
-
-#pulseaudio {
-    min-width: 120px;
 }

@@ -16,7 +16,8 @@
         "cpu",
         "memory",
         "temperature",
-        "pulseaudio"
+        "pulseaudio#sink",
+        "pulseaudio#source"
     ],
     "wlr/workspaces": {
         "disable-scroll": true,
@@ -69,20 +70,34 @@
         "format-icons": ["", "", ""],
         "tooltip": false
     },
-    "pulseaudio": {
+    "pulseaudio#sink": {
         "scroll-step": 5,
-        "format": "{icon} {volume}% {format_source}",
-        "format-muted": " {format_source}",
-        "format-source": " {volume}%",
-        "format-source-muted": "",
+        "format": "{icon} {volume}%",
+        "format-muted": "",
         "format-icons": {
             "default": ["", "", ""]
         },
-        "on-click": "pavucontrol",
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-click-right": "pavucontrol",
         "tooltip": false,
         "states": {
-            "warning": 49,
-            "critical": 79
+            "warning": 50,
+            "critical": 80
+        }
+    },
+    "pulseaudio#source": {
+        "format": "{format_source}",
+        "format-muted": "{format_source}",
+        "format-source": " {volume}%",
+        "format-source-muted": "",
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+        "on-click-right": "pavucontrol",
+        "tooltip": false,
+        "on-scroll-up": "wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+",
+        "on-scroll-down": "wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%-",
+        "states": {
+            "warning": 50,
+            "critical": 80
         }
     },
     "clock": {
