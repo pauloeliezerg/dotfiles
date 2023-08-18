@@ -30,7 +30,7 @@
     "custom/media": {
         "format": "{icon} {}",
         "return-type": "json",
-        "max-length": 40,
+        "max-length": 100,
         "format-icons": {
             "spotify": "",
             "default": "🎜"
@@ -79,11 +79,7 @@
         },
         "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
         "on-click-right": "pavucontrol",
-        "tooltip": false,
-        "states": {
-            "warning": 50,
-            "critical": 80
-        }
+        "tooltip": false
     },
     "pulseaudio#source": {
         "format": "{format_source}",
@@ -94,11 +90,7 @@
         "on-click-right": "pavucontrol",
         "tooltip": false,
         "on-scroll-up": "wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+",
-        "on-scroll-down": "wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%-",
-        "states": {
-            "warning": 50,
-            "critical": 80
-        }
+        "on-scroll-down": "wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%-"
     },
     "clock": {
         "format": "{:%H:%M}",
