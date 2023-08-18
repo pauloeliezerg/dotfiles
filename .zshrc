@@ -1,27 +1,11 @@
-# Lines configured by zsh-newuser-install
-HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
-bindkey -e
+autoload -Uz vcs_info
 
-# delete, alt + delete, home and end keys remap
-bindkey "^[[3~" delete-char
-bindkey "^[[3;3~" delete-word
-bindkey  "^[[H"   beginning-of-line
-bindkey  "^[[F"   end-of-line
+precmd() { vcs_info }
 
-# plugins
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
-source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+zstyle ':vcs_info:git:*' formats '%b  '
 
-# history-substring-search key bindings
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
+setopt PROMPT_SUBST
+PROMPT='%F{cyan}[%n@%m %~]%f%F{magenta} ${vcs_info_msg_0_}%f%F{yellow}$%f %b'
+RPROMPT='%F{blue}%*'
 
-# aliases
-alias config='/usr/bin/git --git-dir=$HOME/dotfiles --work-tree=$HOME'
-
-# starship
-eval "$(starship init zsh)"
-
+alias config="git --git-dir=$HOME/dotfiles --work-tree=$HOME"
