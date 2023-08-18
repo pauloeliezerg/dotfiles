@@ -31,12 +31,12 @@
         "format": "{icon} {}",
         "return-type": "json",
         "max-length": 100,
-        "format-icons": {
-            "spotify": "",
-            "default": "🎜"
-        },
         "escape": true,
-        "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null"
+        "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null",
+        "on-click": "playerctl --player spotify play-pause",
+        "on-click-right": "hyprctl dispatch focuswindow Spotify",
+        "on-scroll-up": "playerctl --player spotify next",
+        "on-scroll-down": "playerctl --player spotify previous"
     },
     "tray": {
         "spacing": 10
