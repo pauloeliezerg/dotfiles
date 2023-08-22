@@ -47,7 +47,7 @@
         "tooltip": false
     },
     "cpu": {
-        "format": "  {usage}%",
+        "format": " {usage}%",
         "tooltip": false,
         "states": {
             "warning": 50,
@@ -94,7 +94,7 @@
     },
     "clock": {
         "format": "{:%H:%M}",
-        "format-alt": "{:%A, %B %d, %Y (%R)}",
+        "format-alt": "{:%A - %B %d - %Y}",
         "tooltip-format": "<tt><small>{calendar}</small></tt>",
         "calendar": {
             "mode"          : "year",
@@ -116,7 +116,6 @@
             "on-click-backward": "tz_down",
             "on-scroll-up": "shift_up",
             "on-scroll-down": "shift_down"
-        },
-        "on-click": "activate"
+        }
     }
 }

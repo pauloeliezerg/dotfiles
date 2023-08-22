@@ -1,13 +1,13 @@
 * {
     font-family: JetBrains Mono, FontAwesome, Roboto, Helvetica, Arial, sans-serif;
-    font-size: 15px;
     font-weight: bolder;
-    border-radius: 5px;
+    font-size: 15px;
 }
 
 window#waybar {
     background-color: transparent;
-    color: #d5c4a1;
+    border-bottom: transparent;
+    color: #ebdbb2;
     transition-property: background-color;
     transition-duration: .5s;
 }
@@ -16,72 +16,110 @@ window#waybar.hidden {
     opacity: 0.2;
 }
 
-button {
-    box-shadow: inset 0 -3px transparent;
+/*
+window#waybar.empty {
+    background-color: transparent;
+}
+window#waybar.solo {
+    background-color: #FFFFFF;
+}
+*/
+
+window#waybar.termite {
+    background-color: #3F3F3F;
+}
+
+window#waybar.chromium {
+    background-color: #000000;
     border: none;
 }
 
-button:hover {
-    background: inherit;
-    background-color: #458588;
-    box-shadow: inset 0 -3px #d5c4a1;
+button {
+    /* Use box-shadow instead of border so the text isn't offset */
+    box-shadow: inset 0 -3px #7c6f64;
+    /* Avoid rounded borders under each button name */
+    border: none;
+    border-radius: 0;
 }
 
-#workspaces {
-    margin: 0 4px;
-    background-color: #282828;
+/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+button:hover {
+    background: inherit;
+    box-shadow: inset 0 -3px #ebdbb2;
 }
 
 #workspaces button {
-    padding: 0 7.5px;
-    color: #d5c4a1;
+    padding: 0 5px;
+    background-color: #282828;
+    color: #7c6f64;
 }
 
 #workspaces button:hover {
-    background-color: #3c3836;
+    background: #32302f;
+    color: #a89984;
+    box-shadow: inset 0 -3px #a89984;
 }
 
 #workspaces button.active {
-    color: #458588;
-    background-color: #3c3836;
-    box-shadow: inset 0 -3px #83a598;
-}
-
-#workspaces button.active:hover {
-    background-color: #64727D;
-    box-shadow: inset 0 -3px #83a598;
+    color: #ebdbb2;
+    background-color: #504945;
+    box-shadow: inset 0 -3px #ebdbb2;
 }
 
 #workspaces button.urgent {
     background-color: #fb4934;
 }
 
-#custom-media,
-#tray,
+#clock,
+#network,
 #cpu,
 #memory,
-#disk,
 #temperature,
-#network,
-#pulseaudio,
-#wireplumber,
-#clock {
+#pulseaudio.sink,
+#pulseaudio.source,
+#custom-media,
+#tray {
+    background-color: #282828;
     padding: 0 10px;
-    color: #d5c4a1;
+    color: #ebdbb2;
+    border-bottom: 3px solid #7c6f64;
 }
 
+#network,
+#cpu,
+#memory,
+#temperature,
+#pulseaudio.sink,
+#pulseaudio.source {
+    border-bottom: 3px solid #689d6a;
+}
+
+#cpu,
+#memory,
+#temperature,
+#pulseaudio.sink,
+#pulseaudio.source {
+    min-width: 65px;
+}
+
+#window,
+#workspaces {
+    margin: 0 4px;
+}
+
+/* If workspaces is the leftmost module, omit left margin */
 .modules-left > widget:first-child > #workspaces {
     margin-left: 0;
 }
 
+/* If workspaces is the rightmost module, omit right margin */
 .modules-right > widget:last-child > #workspaces {
     margin-right: 0;
 }
 
-
 @keyframes blink {
     to {
-        background-color: #d5c4a1;
+        background-color: #ffffff;
         color: #000000;
     }
 }
@@ -90,24 +128,35 @@ label:focus {
     background-color: #000000;
 }
 
-button,
-.modules-right,
-.modules-center {
-    background-color: #282828;
+#network.disconnected {
+    border-bottom: 3px solid #7c6f64;
+}
+
+#pulseaudio.sink.muted,
+#pulseaudio.source.source-muted {
+    color: #7c6f64;
+    border-bottom: 3px solid #7c6f64;
 }
 
 #custom-media {
-    color: #1d2021;
-    min-width: 100px;
-    background-color: #689d6a;
+    background-color: #8ec07c;
+    color: #282828;
+    border-bottom: 3px solid #689d6a;
+    border-right: 3px solid #689d6a;
 }
 
-#clock {
-    box-shadow: inset 0 -2px #fe8019;
+#cpu.warning,
+#memory.warning {
+    border-bottom: 3px solid #fabd2f;
 }
 
-#tray {
-    box-shadow: inset 0 -2px #b16286;
+#cpu.critical,
+#memory.critical {
+    border-bottom: 3px solid #fb4934;
+}
+
+#temperature.critical {
+    background-color: #fb4934;
 }
 
 #tray > .passive {
@@ -116,46 +165,5 @@ button,
 
 #tray > .needs-attention {
     -gtk-icon-effect: highlight;
-    background-color: #3c3836;
-    box-shadow: inset 0 -3px #fabd2f;
-}
-
-#network {
-    color: #d5c4a1;
-    box-shadow: inset 0 -2px #8ec07c;
-}
-
-#network.disconnected {
-    color: #d5c4a1;
-    box-shadow: inset 0 -2px #fb4934;
-}
-
-#cpu,
-#memory,
-#temperature,
-#pulseaudio.source,
-#pulseaudio.sink {
-    color: #d5c4a1;
-    box-shadow: inset 0 -2px #8ec07c;
-    min-width: 70px;
-}
-
-#pulseaudio.source.source-muted,
-#pulseaudio.sink.muted {
-    color: #7c6f64;
-    box-shadow: inset 0 -2px #7c6f64;
-}
-
-#cpu.warning,
-#memory.warning,
-#temperature.warning {
-    color: #d5c4a1;
-    box-shadow: inset 0 -2px #fabd2f;
-}
-
-#cpu.critical,
-#memory.critical,
-#temperature.critical {
-    color: #d5c4a1;
-    box-shadow: inset 0 -2px #fb4934;
+    background-color: #fb4934;
 }
