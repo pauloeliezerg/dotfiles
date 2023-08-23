@@ -7,7 +7,7 @@
 window#waybar {
     background-color: transparent;
     border-bottom: transparent;
-    color: #ebdbb2;
+    color: #d4be98;
     transition-property: background-color;
     transition-duration: .5s;
 }
@@ -45,7 +45,7 @@ button {
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
 button:hover {
     background: inherit;
-    box-shadow: inset 0 -3px #ebdbb2;
+    box-shadow: inset 0 -3px #d4be98;
 }
 
 #workspaces button {
@@ -55,19 +55,19 @@ button:hover {
 }
 
 #workspaces button:hover {
-    background: #32302f;
+    background: #3c3836;
     color: #a89984;
     box-shadow: inset 0 -3px #a89984;
 }
 
 #workspaces button.active {
-    color: #ebdbb2;
+    color: #d4be98;
     background-color: #504945;
-    box-shadow: inset 0 -3px #ebdbb2;
+    box-shadow: inset 0 -3px #d4be98;
 }
 
 #workspaces button.urgent {
-    background-color: #fb4934;
+    background-color: #ea6962;
 }
 
 #clock,
@@ -81,17 +81,8 @@ button:hover {
 #tray {
     background-color: #282828;
     padding: 0 10px;
-    color: #ebdbb2;
-    border-bottom: 3px solid #7c6f64;
-}
-
-#network,
-#cpu,
-#memory,
-#temperature,
-#pulseaudio.sink,
-#pulseaudio.source {
-    border-bottom: 3px solid #689d6a;
+    color: #d4be98;
+    border-bottom: 3px solid #504945;
 }
 
 #cpu,
@@ -129,34 +120,26 @@ label:focus {
 }
 
 #network.disconnected {
-    border-bottom: 3px solid #7c6f64;
+    color: #504945;
 }
 
 #pulseaudio.sink.muted,
 #pulseaudio.source.source-muted {
-    color: #7c6f64;
-    border-bottom: 3px solid #7c6f64;
-}
-
-#custom-media {
-    background-color: #8ec07c;
-    color: #282828;
-    border-bottom: 3px solid #689d6a;
-    border-right: 3px solid #689d6a;
+    color: #504945;
 }
 
 #cpu.warning,
 #memory.warning {
-    border-bottom: 3px solid #fabd2f;
+    border-bottom: 3px solid #d8a657;
 }
 
 #cpu.critical,
 #memory.critical {
-    border-bottom: 3px solid #fb4934;
+    border-bottom: 3px solid #ea6962;
 }
 
 #temperature.critical {
-    background-color: #fb4934;
+    border-bottom: 3px solid #ea6962;
 }
 
 #tray > .passive {
@@ -165,5 +148,5 @@ label:focus {
 
 #tray > .needs-attention {
     -gtk-icon-effect: highlight;
-    background-color: #fb4934;
+    background-color: #ea6962;
 }
