@@ -9,6 +9,33 @@ local act = wezterm.action
 -- ===== SHELL =====
 config.default_prog = { '/bin/zsh' }
 
+-- ===== MULTIPLEXADOR (Sessões Persistente) =====
+config.unix_domains = {
+  {
+    name = 'unix',
+  },
+}
+
+-- Isso NÃO afeta o 'connect', apenas o menu GUI
+-- config.launch_menu = {
+--   {
+--     label = "Top",
+--     args = { "top" },
+--   },
+--   {
+--     label = "Bash",
+--     args = { "bash", "-l" },
+--   },
+--   {
+--     label = "Connect to Mux",
+--     args = { "wezterm", "connect", "unix" },
+--   },
+-- }
+
+config.skip_close_confirmation_for_processes_named = {
+  'bash', 'zsh', 'fish', 'tmux', 'nvim', 'vim', 'ssh', 'sudo',
+}
+
 -- ===== CORES =====
 config.colors = {
   foreground = '#d7dae0',
@@ -164,6 +191,11 @@ config.keys = {
       pane:send_text('\n\x0c')
     end)
   },
+  -- {
+  --   key = 'p',
+  --   mods = 'CTRL|SHIFT',
+  --   action = wezterm.action.ShowLauncher,
+  -- },
 }
 
 return config
