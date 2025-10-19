@@ -15,14 +15,20 @@ typeset -g _cache_pwd=""
 typeset -g _skip_next_duration=false
 typeset -g _last_exit_status=0
 typeset -g _show_exit_color=false
+typeset -g _command_executed=false
 
 # ===== HOOKS DO PROMPT =====
 autoload -Uz add-zle-hook-widget add-zsh-hook
 
-# Gerencia cursor
+# Gerencia cursor e detecta linha vazia
 if (( $+functions[add-zle-hook-widget] )); then
   _prompt_zle_line_finish() {
-    [[ -z "$BUFFER" ]] && _skip_next_duration=true || _skip_next_duration=false
+    if [[ -z "$BUFFER" ]]; then
+      _skip_next_duration=true
+      _command_executed=false
+    else
+      _skip_next_duration=false
+    fi
   }
   add-zle-hook-widget zle-line-finish _prompt_zle_line_finish
 fi
@@ -30,7 +36,14 @@ fi
 # Timer e captura de exit status
 preexec() {
   _cmd_start=$(($(date +%s%N)/1000000))
-  [[ "$1" =~ ^clear($| ) ]] && _skip_next_duration=true || _skip_next_duration=false
+  _command_executed=true
+  
+  # Detecta comando clear
+  if [[ "$1" =~ ^clear($| ) ]]; then
+    _skip_next_duration=true
+  else
+    _skip_next_duration=false
+  fi
 }
 
 _prompt_precmd_handler() {
@@ -38,9 +51,10 @@ _prompt_precmd_handler() {
   _show_exit_color=true
   
   local needs_update=false
+  local should_print_duration=false
   
-  # Calcula duração
-  if [[ $_cmd_start -gt 0 ]]; then
+  # Calcula duração apenas se um comando foi executado
+  if [[ $_cmd_start -gt 0 && $_command_executed == true ]]; then
     local now=$(($(date +%s%N)/1000000))
     local elapsed=$((now - _cmd_start))
     
@@ -56,18 +70,28 @@ _prompt_precmd_handler() {
       _cmd_duration="${elapsed}ms"
     fi
     
-    _cmd_start=0
+    should_print_duration=true
     needs_update=true
-  elif [[ $_skip_next_duration == true ]]; then
-    _cmd_duration=""
-    _show_exit_color=false
-  else
+  fi
+  
+  # Reseta o timer
+  _cmd_start=0
+  
+  # Imprime duração apenas se comando foi executado e não deve pular
+  if [[ $should_print_duration == true && $_skip_next_duration == false ]]; then
+    echo "\e[33m⏱  $_cmd_duration\e[0m"
+  fi
+  
+  # Se não executou comando (Ctrl+C em linha vazia), não mostra cor de exit
+  if [[ $_command_executed == false ]]; then
     _show_exit_color=false
   fi
   
-  # Imprime duração se necessário
-  [[ $_skip_next_duration == false && -n "$_cmd_duration" ]] && echo "\e[33m⏱  $_cmd_duration\e[0m"
-  [[ $_skip_next_duration == true ]] && _skip_next_duration=false
+  # Reseta flags
+  if [[ $_skip_next_duration == true ]]; then
+    _skip_next_duration=false
+  fi
+  _command_executed=false
   
   # Atualiza caches apenas se necessário
   if [[ "$PWD" != "$_cache_pwd" || $needs_update == true ]]; then

@@ -75,17 +75,6 @@ if [[ -n "${terminfo[khome]}" ]]; then
   bindkey "${terminfo[kcub1]}" backward-char
   bindkey "${terminfo[kcuf1]}" forward-char
   bindkey "${terminfo[kcbt]}" reverse-menu-complete
-
-  # Application mode
-  if (( ${+terminfo[smkx]} && ${+terminfo[rmkx]} )); then
-    autoload -Uz add-zle-hook-widget 2>/dev/null
-    if (( $+functions[add-zle-hook-widget] )); then
-      zle_application_mode_start() { echoti smkx }
-      zle_application_mode_stop() { echoti rmkx }
-      add-zle-hook-widget -Uz zle-line-init zle_application_mode_start
-      add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
-    fi
-  fi
 fi
 
 # ===== KEYBINDINGS =====
@@ -106,10 +95,25 @@ load_plugins() {
 if [[ -o zle ]]; then
   _lazy_load_first_interaction() {
     load_plugins
-    zle end-of-line
-    zle -D zle-line-init
+    zle end-of-line 2>/dev/null
   }
-  zle -N zle-line-init _lazy_load_first_interaction
+  
+  # Usa add-zle-hook-widget se disponível, caso contrário usa zle -N
+  autoload -Uz add-zle-hook-widget 2>/dev/null
+  if (( $+functions[add-zle-hook-widget] )); then
+    add-zle-hook-widget -Uz zle-line-init _lazy_load_first_interaction
+    
+    # Application mode usando hooks
+    if (( ${+terminfo[smkx]} && ${+terminfo[rmkx]} )); then
+      zle_application_mode_start() { echoti smkx }
+      zle_application_mode_stop() { echoti rmkx }
+      add-zle-hook-widget -Uz zle-line-init zle_application_mode_start
+      add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
+    fi
+  else
+    # Fallback para zle -N se add-zle-hook-widget não estiver disponível
+    zle -N zle-line-init _lazy_load_first_interaction
+  fi
 else
   # Fallback se não estiver em modo interativo
   load_plugins
