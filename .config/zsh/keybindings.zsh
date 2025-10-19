@@ -4,6 +4,10 @@
 
 # ===== KEYBINDINGS BÁSICOS =====
 
+# History Begining Search
+bindkey "^[[A" history-beginning-search-backward
+bindkey "^[[B" history-beginning-search-forward
+
 # Ctrl+U diferente do padrão Zsh
 bindkey "^U" backward-kill-line
 

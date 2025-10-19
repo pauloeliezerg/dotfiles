@@ -101,12 +101,12 @@ precmd() {
   
   # Imprime a duração na tela para persistência (apenas se não for para pular)
   if [[ $_skip_next_duration == false ]] && [[ -n "$_cmd_duration" ]]; then
-    echo "\e[33m⏱  $_cmd_duration\e[0m"
+    echo "Command took: $_cmd_duration"
   fi
   
   # Se for para pular a próxima, imprime uma linha vazia para "timestamp vazio" e reseta
   if [[ $_skip_next_duration == true ]]; then
-    # echo ""  # Linha vazia para representar timestamp vazio
+    echo "Command took: "  # Linha vazia para representar timestamp vazio
     _skip_next_duration=false
   fi
   
