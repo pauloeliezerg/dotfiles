@@ -33,14 +33,16 @@ _initialize_prompt() {
 
 # ===== HOOKS DO PROMPT =====
 
+# Carrega o sistema de hooks se ainda não estiver carregado
+autoload -Uz add-zle-hook-widget
+
 # Detecta se Enter foi pressionado em linha vazia
-zle-line-init() {
+_prompt_zle_line_init() {
   # Cursor sólido, sem blink
   printf '\e[2 q'
 }
-zle -N zle-line-init
 
-zle-line-finish() {
+_prompt_zle_line_finish() {
   # CRÍTICO: Esconde cursor IMEDIATAMENTE quando Enter é pressionado
   printf '\e[?25l'
   
@@ -53,7 +55,20 @@ zle-line-finish() {
     _skip_next_duration=false
   fi
 }
-zle -N zle-line-finish
+
+# Usa add-zle-hook-widget para não conflitar com outros hooks
+add-zle-hook-widget zle-line-init _prompt_zle_line_init
+add-zle-hook-widget zle-line-finish _prompt_zle_line_finish
+
+# CRÍTICO: Captura exit status IMEDIATAMENTE antes de qualquer precmd
+autoload -Uz add-zsh-hook
+
+_prompt_capture_exit_status() {
+  _last_exit_status=$?
+  # echo "[DEBUG CAPTURE] Exit status capturado: $_last_exit_status" >&2
+}
+
+add-zsh-hook precmd _prompt_capture_exit_status
 
 # Timer de comando (roda ANTES do comando)
 preexec() {
@@ -75,15 +90,14 @@ preexec() {
   printf '\e[?25h'
 }
 
-# Atualiza informações após comando (roda DEPOIS do comando)
-precmd() {
+# Atualiza informações após comando - usa nome único para evitar conflitos
+_prompt_precmd_handler() {
   # CRÍTICO: Esconde cursor no início do precmd
   printf '\e[?25l'
-  
-  # Captura o exit status do último comando IMEDIATAMENTE
-  _last_exit_status=$?
+
+  # Mostra cor baseada no último comando executado
   _show_exit_color=true
-  
+
   # Garante inicialização no primeiro prompt
   _initialize_prompt
   
@@ -110,9 +124,14 @@ precmd() {
     fi
     _cmd_start=0
     needs_update=true
+    
   elif [[ $_empty_enter_pressed == true ]]; then
-    # Enter vazio - limpa duração
+    # Enter vazio - limpa duração E não mostra cor de status
     _cmd_duration=""
+    _show_exit_color=false
+  else
+    # Primeiro prompt ou situação inicial - não mostra cor
+    _show_exit_color=false
   fi
   
   # Imprime a duração na tela para persistência (apenas se não for para pular)
@@ -143,6 +162,10 @@ precmd() {
   # Mostra cursor novamente após prompt estar pronto
   printf '\e[?25h'
 }
+
+# CRÍTICO: Adiciona como PRIMEIRO hook em precmd_functions
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _prompt_precmd_handler
 
 # ===== FUNÇÕES DE CACHE =====
 
@@ -207,8 +230,6 @@ _prompt_char() {
     else
       echo "%F{red}%B\$%b%f"
     fi
-    # Reseta para branco no próximo caractere digitado
-    _show_exit_color=false
   else
     # Cor padrão branca antes da execução
     echo "%F{white}%B\$%b%f"

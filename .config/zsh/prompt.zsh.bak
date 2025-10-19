@@ -16,6 +16,9 @@ typeset -g _last_cmd_executed=false
 typeset -g _prompt_initialized=false
 typeset -g _empty_enter_pressed=false
 typeset -g _skip_next_duration=false
+typeset -g _last_exit_status=0
+typeset -g _show_exit_color=false
+typeset -g _last_command=""
 
 # ===== INICIALIZAÇÃO =====
 _initialize_prompt() {
@@ -30,14 +33,16 @@ _initialize_prompt() {
 
 # ===== HOOKS DO PROMPT =====
 
+# Carrega o sistema de hooks se ainda não estiver carregado
+autoload -Uz add-zle-hook-widget
+
 # Detecta se Enter foi pressionado em linha vazia
-zle-line-init() {
+_prompt_zle_line_init() {
   # Cursor sólido, sem blink
   printf '\e[2 q'
 }
-zle -N zle-line-init
 
-zle-line-finish() {
+_prompt_zle_line_finish() {
   # CRÍTICO: Esconde cursor IMEDIATAMENTE quando Enter é pressionado
   printf '\e[?25l'
   
@@ -50,24 +55,55 @@ zle-line-finish() {
     _skip_next_duration=false
   fi
 }
-zle -N zle-line-finish
+
+# Usa add-zle-hook-widget para não conflitar com outros hooks
+add-zle-hook-widget zle-line-init _prompt_zle_line_init
+add-zle-hook-widget zle-line-finish _prompt_zle_line_finish
+
+# CRÍTICO: Captura exit status IMEDIATAMENTE antes de qualquer precmd
+autoload -Uz add-zsh-hook
+
+_prompt_capture_exit_status() {
+  _last_exit_status=$?
+  # echo "[DEBUG CAPTURE] Exit status capturado: $_last_exit_status" >&2
+}
+
+add-zsh-hook precmd _prompt_capture_exit_status
+
+# Hook adicional: reseta cor quando usuário começa a digitar
+_prompt_self_insert() {
+  _show_exit_color=false
+  zle reset-prompt
+}
+
+# Adiciona hook em self-insert (quando qualquer tecla é digitada)
+add-zle-hook-widget zle-line-pre-redraw _prompt_self_insert
 
 # Timer de comando (roda ANTES do comando)
 preexec() {
+  # Salva o comando que será executado
+  _last_command="$1"
+  
   _cmd_start=$(($(date +%s%N)/1000000))
   _last_cmd_executed=true
   _empty_enter_pressed=false
-  _skip_next_duration=false  # Reseta para comandos reais
+  
+  # Verifica se o comando é 'clear' - se for, pula duração
+  if [[ "$1" =~ ^clear($| ) ]] || [[ "$1" == "clear" ]]; then
+    _skip_next_duration=true
+  else
+    _skip_next_duration=false
+  fi
   
   # Mostra cursor antes de executar comando
   printf '\e[?25h'
 }
 
-# Atualiza informações após comando (roda DEPOIS do comando)
-precmd() {
+# Atualiza informações após comando - usa nome único para evitar conflitos
+_prompt_precmd_handler() {
   # CRÍTICO: Esconde cursor no início do precmd
   printf '\e[?25l'
-  
+
   # Garante inicialização no primeiro prompt
   _initialize_prompt
   
@@ -94,19 +130,25 @@ precmd() {
     fi
     _cmd_start=0
     needs_update=true
+    
+    _show_exit_color=true
   elif [[ $_empty_enter_pressed == true ]]; then
-    # Enter vazio - limpa duração
+    # Enter vazio - limpa duração E não mostra cor de status
     _cmd_duration=""
+    _show_exit_color=false
+  else
+    # Primeiro prompt ou situação inicial - não mostra cor
+    _show_exit_color=false
   fi
   
   # Imprime a duração na tela para persistência (apenas se não for para pular)
   if [[ $_skip_next_duration == false ]] && [[ -n "$_cmd_duration" ]]; then
-    echo "Command took: $_cmd_duration"
+    echo "\e[33m⏱  $_cmd_duration\e[0m"
   fi
   
   # Se for para pular a próxima, imprime uma linha vazia para "timestamp vazio" e reseta
   if [[ $_skip_next_duration == true ]]; then
-    echo "Command took: "  # Linha vazia para representar timestamp vazio
+    # echo ""  # Linha vazia para representar timestamp vazio
     _skip_next_duration=false
   fi
   
@@ -127,6 +169,10 @@ precmd() {
   # Mostra cursor novamente após prompt estar pronto
   printf '\e[?25h'
 }
+
+# CRÍTICO: Adiciona como PRIMEIRO hook em precmd_functions
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _prompt_precmd_handler
 
 # ===== FUNÇÕES DE CACHE =====
 
@@ -184,10 +230,16 @@ _prompt_dir() {
 }
 
 _prompt_char() {
-  if [[ $? -eq 0 ]]; then
-    echo "%F{green}%B\$%b%f"
+  if [[ $_show_exit_color == true ]]; then
+    # Mostra cor baseada no último comando executado
+    if [[ $_last_exit_status -eq 0 ]]; then
+      echo "%F{green}%B\$%b%f"
+    else
+      echo "%F{red}%B\$%b%f"
+    fi
   else
-    echo "%F{red}%B\$%b%f"
+    # Cor padrão branca antes da execução
+    echo "%F{white}%B\$%b%f"
   fi
 }
 
