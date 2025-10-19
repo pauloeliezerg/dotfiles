@@ -73,7 +73,21 @@ precmd() {
   if [[ $_cmd_start -gt 0 ]]; then
     local now=$(($(date +%s%N)/1000000))
     local elapsed=$((now - _cmd_start))
-    _cmd_duration="${elapsed}ms"
+    # Formata duração baseado no tempo decorrido
+    if [[ $elapsed -ge 60000 ]]; then
+      # >= 1 minuto: mostra minutos e segundos
+      local mins=$((elapsed / 60000))
+      local secs=$(((elapsed % 60000) / 1000))
+      _cmd_duration="${mins}m ${secs}s"
+    elif [[ $elapsed -ge 1000 ]]; then
+      # >= 1 segundo: mostra segundos e milisegundos
+      local secs=$((elapsed / 1000))
+      local ms=$((elapsed % 1000))
+      _cmd_duration="${secs}s ${ms}ms"
+    else
+      # < 1 segundo: mostra apenas milisegundos
+      _cmd_duration="${elapsed}ms"
+    fi
     _cmd_start=0
     needs_update=true
   elif [[ $_empty_enter_pressed == true ]]; then
