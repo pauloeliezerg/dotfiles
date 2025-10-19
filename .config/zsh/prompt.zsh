@@ -16,6 +16,9 @@ typeset -g _last_cmd_executed=false
 typeset -g _prompt_initialized=false
 typeset -g _empty_enter_pressed=false
 typeset -g _skip_next_duration=false
+typeset -g _last_exit_status=0
+typeset -g _show_exit_color=false
+typeset -g _last_command=""
 
 # ===== INICIALIZAÇÃO =====
 _initialize_prompt() {
@@ -54,10 +57,19 @@ zle -N zle-line-finish
 
 # Timer de comando (roda ANTES do comando)
 preexec() {
+  # Salva o comando que será executado
+  _last_command="$1"
+  
   _cmd_start=$(($(date +%s%N)/1000000))
   _last_cmd_executed=true
   _empty_enter_pressed=false
-  _skip_next_duration=false  # Reseta para comandos reais
+  
+  # Verifica se o comando é 'clear' - se for, pula duração
+  if [[ "$1" =~ ^clear($| ) ]] || [[ "$1" == "clear" ]]; then
+    _skip_next_duration=true
+  else
+    _skip_next_duration=false
+  fi
   
   # Mostra cursor antes de executar comando
   printf '\e[?25h'
@@ -67,6 +79,10 @@ preexec() {
 precmd() {
   # CRÍTICO: Esconde cursor no início do precmd
   printf '\e[?25l'
+  
+  # Captura o exit status do último comando IMEDIATAMENTE
+  _last_exit_status=$?
+  _show_exit_color=true
   
   # Garante inicialização no primeiro prompt
   _initialize_prompt
@@ -184,10 +200,18 @@ _prompt_dir() {
 }
 
 _prompt_char() {
-  if [[ $? -eq 0 ]]; then
-    echo "%F{green}%B\$%b%f"
+  if [[ $_show_exit_color == true ]]; then
+    # Mostra cor baseada no último comando executado
+    if [[ $_last_exit_status -eq 0 ]]; then
+      echo "%F{green}%B\$%b%f"
+    else
+      echo "%F{red}%B\$%b%f"
+    fi
+    # Reseta para branco no próximo caractere digitado
+    _show_exit_color=false
   else
-    echo "%F{red}%B\$%b%f"
+    # Cor padrão branca antes da execução
+    echo "%F{white}%B\$%b%f"
   fi
 }
 
