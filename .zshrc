@@ -1,4 +1,4 @@
-zmodload zsh/zprof
+# zmodload zsh/zprof
 
 # ================================================================
 # .zshrc - Configuração principal do Zsh (Otimizado)
@@ -154,4 +154,4 @@ source "${ZDOTDIR}/prompt.zsh"
 add-zsh-hook -D precmd '*zsh_autosuggest*'
 add-zsh-hook -D precmd '*highlight*'
 
-zprof
+# zprof
