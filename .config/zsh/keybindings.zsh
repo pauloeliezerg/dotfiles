@@ -5,8 +5,8 @@
 # ===== KEYBINDINGS BÁSICOS =====
 
 # History Beginning Search
-bindkey "^[[A" history-beginning-search-backward
-bindkey "^[[B" history-beginning-search-forward
+# bindkey "^[[A" history-beginning-search-backward
+# bindkey "^[[B" history-beginning-search-forward
 
 # Garante cursor no final após history search
 _history_search_with_end() {
@@ -15,7 +15,6 @@ _history_search_with_end() {
 }
 zle -N _history_search_with_end
 bindkey "^[[A" _history_search_with_end
-bindkey "^[[B" _history_search_with_end
 
 # Ctrl+U diferente do padrão Zsh
 bindkey "^U" backward-kill-line
