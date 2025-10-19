@@ -4,8 +4,7 @@
 
 # ===== KEYBINDINGS BÁSICOS =====
 
-# History Beginning Search - CORRIGIDO
-# Usa os widgets padrão sem interferência
+# History Beginning Search
 bindkey "^[[A" up-line-or-beginning-search
 bindkey "^[[B" down-line-or-beginning-search
 
@@ -21,6 +20,24 @@ bindkey "^[[1;3D" backward-word
 # Outras teclas
 bindkey "^[[3;5~" kill-word
 bindkey "^[[Z" reverse-menu-complete
+
+# ===== MENU SELECT KEYBINDINGS =====
+# Navegação no menu de completion
+bindkey -M menuselect '^[[A' up-line-or-history
+bindkey -M menuselect '^[[B' down-line-or-history
+bindkey -M menuselect '^[[C' forward-char
+bindkey -M menuselect '^[[D' backward-char
+bindkey -M menuselect '^[[Z' reverse-menu-complete
+bindkey -M menuselect '^M' .accept-line
+bindkey -M menuselect '^I' forward-char
+bindkey -M menuselect '^[' send-break
+bindkey -M menuselect '^G' send-break
+
+# Atalhos adicionais do menu
+bindkey -M menuselect 'h' backward-char
+bindkey -M menuselect 'j' down-line-or-history
+bindkey -M menuselect 'k' up-line-or-history
+bindkey -M menuselect 'l' forward-char
 
 # ===== BASH-LIKE BINDINGS =====
 

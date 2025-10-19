@@ -1,4 +1,4 @@
-zmodload zsh/zprof
+# zmodload zsh/zprof
 
 # ================================================================
 # .zshrc - Configuração principal do Zsh (Otimizado)
@@ -9,7 +9,7 @@ skip_global_compinit=1
 ZSH_DISABLE_COMPFIX=true
 
 # ===== PERFORMANCE =====
-setopt NO_BEEP NO_FLOW_CONTROL NO_HIST_VERIFY
+setopt NO_BEEP NO_FLOW_CONTROL NO_HIST_VERIFY AUTO_CD
 KEYTIMEOUT=1
 
 # ===== XDG BASE DIRECTORY =====
@@ -27,29 +27,29 @@ for file in $config_files; do
   [[ -f "$file" ]] && source "$file"
 done
 
-# ===== COMPLETION OTIMIZADO =====
-# Carrega compinit de forma assíncrona mas segura
+# ===== COMPLETION SYSTEM (OTIMIZADO) =====
+# Carrega apenas o módulo complist (necessário para menu select)
+zmodload zsh/complist
+
+# Prepara fpath e autoload
 fpath=(${ZDOTDIR}/completions $fpath)
 autoload -Uz compinit
 
-_init_completion() {
-  local compinit_dump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
-  [[ -d "${compinit_dump:h}" ]] || mkdir -p "${compinit_dump:h}"
-  
-  # Recompila apenas se não existe ou tem mais de 24h
-  if [[ -f "$compinit_dump" && -n "$compinit_dump"(#qNmh-24) ]]; then
-    compinit -C -d "$compinit_dump"
-  else
-    compinit -d "$compinit_dump"
-    # Compila em background
-    { zcompile "$compinit_dump" } &!
-  fi
-}
+# Caminho do cache
+local compinit_dump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+[[ -d "${compinit_dump:h}" ]] || mkdir -p "${compinit_dump:h}"
 
-# Inicializa completion em background após o shell estar pronto
-{
-  _init_completion
-} &!
+# Carrega compinit de forma otimizada mas síncrona
+# Isso garante que tudo funcione corretamente
+if [[ -f "$compinit_dump" && -n "$compinit_dump"(#qNmh-24) ]]; then
+  # Usa cache se tem menos de 24h (rápido)
+  compinit -C -d "$compinit_dump"
+else
+  # Regenera cache (mais lento, mas só acontece 1x por dia)
+  compinit -i -d "$compinit_dump"
+  # Compila em background para próximas sessões serem ainda mais rápidas
+  { zcompile "$compinit_dump" } &!
+fi
 
 # ===== COMPLETION STYLES =====
 zstyle ':completion:*' menu select
@@ -63,8 +63,8 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:
 
 # ===== SHELL OPTIONS =====
 bindkey -e
-setopt complete_in_word pushdsilent no_auto_remove_slash no_list_ambiguous
-unsetopt CASE_GLOB menu_complete
+setopt complete_in_word pushdsilent no_auto_remove_slash always_to_end
+unsetopt CASE_GLOB
 stty stop undef start undef 2>/dev/null
 
 # ===== HISTORY =====
@@ -147,4 +147,5 @@ source "${ZDOTDIR}/prompt.zsh"
 add-zsh-hook -D precmd '*zsh_autosuggest*'
 add-zsh-hook -D precmd '*highlight*'
 
-zprof
+# Descomente a linha abaixo para fazer profiling
+# zprof
