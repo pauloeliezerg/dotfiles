@@ -128,8 +128,8 @@ config.set_environment_variables = {
 
 -- ===== CURSOR =====
 -- Cursor sólido, sem blink
-config.default_cursor_style = "BlinkingBar"
-config.cursor_blink_rate = 500
+-- config.default_cursor_style = "BlinkingBar"
+-- config.cursor_blink_rate = 500
 
 -- CRÍTICO: Desabilita otimizações que causam flicker
 config.force_reverse_video_cursor = false
@@ -179,10 +179,10 @@ config.keys = {
       window:perform_action(wezterm.action.ScrollToBottom, pane)
       local height = pane:get_dimensions().viewport_rows
       local blank_viewport = string.rep("\n", height)
-      wezterm.sleep_ms(5)
+      wezterm.sleep_ms(150)
       pane:inject_output(blank_viewport)
       pane:inject_output('\x1b[H\x1b[2J')
-      pane:send_text('\x0c')
+      pane:send_text('\n\x0c')
     end)
   },
 }
