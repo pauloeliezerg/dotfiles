@@ -179,7 +179,7 @@ config.keys = {
       window:perform_action(wezterm.action.ScrollToBottom, pane)
       local height = pane:get_dimensions().viewport_rows
       local blank_viewport = string.rep("\n", height)
-      wezterm.sleep_ms(150)
+      wezterm.sleep_ms(25)
       pane:inject_output(blank_viewport)
       pane:inject_output('\x1b[H\x1b[2J')
       pane:send_text('\n\x0c')
