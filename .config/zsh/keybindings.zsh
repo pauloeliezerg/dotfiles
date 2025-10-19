@@ -1,21 +1,28 @@
 # ================================================================
-# .zsh_keybindings - Configuração de teclas de atalho
+# .zsh_keybindings - Configuração de teclas de atalho (Otimizado)
 # ================================================================
 
 # ===== KEYBINDINGS BÁSICOS =====
 
-# History Begining Search
+# History Beginning Search
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
+
+# Garante cursor no final após history search
+_history_search_with_end() {
+  zle history-beginning-search-backward
+  zle end-of-line
+}
+zle -N _history_search_with_end
+bindkey "^[[A" _history_search_with_end
+bindkey "^[[B" _history_search_with_end
 
 # Ctrl+U diferente do padrão Zsh
 bindkey "^U" backward-kill-line
 
-# Arrow keys com Ctrl
+# Arrow keys com Ctrl e Alt
 bindkey "^[[1;5C" forward-word
 bindkey "^[[1;5D" backward-word
-
-# Arrow keys com Alt
 bindkey "^[[1;3C" forward-word
 bindkey "^[[1;3D" backward-word
 
@@ -62,9 +69,7 @@ bindkey "^[^]" character-search-backward
 # Magic space - expande histórico apenas quando necessário
 magic-space() {
   local expanded=false
-  if [[ $LBUFFER == *\!* ]]; then
-    zle expand-history && expanded=true
-  fi
+  [[ $LBUFFER == *\!* ]] && zle expand-history && expanded=true
   LBUFFER+=" "
   [[ $expanded == true ]] && zle reset-prompt
 }
@@ -109,37 +114,34 @@ yank-nth-arg() {
   else
     local n=$NUMERIC
     zle history-search-backward
-    local words=("${(@s/ /)BUFFER}")
+    local -a words=("${(@s/ /)BUFFER}")
     if (( n <= ${#words} )); then
-      local arg="${words[n]}"
       zle end-of-history
-      LBUFFER+="$arg"
+      LBUFFER+="${words[n]}"
     fi
   fi
 }
 zle -N yank-nth-arg
 
 # Revert line
-revert-line() {
-  zle send-break
-}
+revert-line() { zle send-break }
 zle -N revert-line
 
 # ===== COMPLETION HELPERS =====
 
-possible-command-completions() { zle complete-word; }
+possible-command-completions() { zle complete-word }
 zle -N possible-command-completions
 
-possible-filename-completions() { zle menu-complete; }
+possible-filename-completions() { zle menu-complete }
 zle -N possible-filename-completions
 
-possible-hostname-completions() { zle _complete_hosts; }
+possible-hostname-completions() { zle _complete_hosts }
 zle -N possible-hostname-completions
 
-possible-username-completions() { zle _complete_users; }
+possible-username-completions() { zle _complete_users }
 zle -N possible-username-completions
 
-possible-variable-completions() { zle _complete_vars; }
+possible-variable-completions() { zle _complete_vars }
 zle -N possible-variable-completions
 
 # ===== RE-READ INIT FILE =====
@@ -155,14 +157,11 @@ bindkey "^X^R" re-read-init-file
 
 do-lowercase-version() {
   local char=$KEYS[-1]
-  if [[ $char = [A-Z] ]]; then
-    LBUFFER+=${(L)char}
-  else
-    zle self-insert
-  fi
+  [[ $char = [A-Z] ]] && LBUFFER+=${(L)char} || zle self-insert
 }
 zle -N do-lowercase-version
 
+# Bind todas as letras maiúsculas de uma vez
 for key in {A..Z}; do
   bindkey "^X$key" do-lowercase-version
 done

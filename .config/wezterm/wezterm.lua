@@ -128,10 +128,8 @@ config.set_environment_variables = {
 
 -- ===== CURSOR =====
 -- Cursor sólido, sem blink
-config.default_cursor_style = "SteadyBar"
-config.cursor_blink_rate = 0
-config.cursor_blink_ease_in = 'Constant'
-config.cursor_blink_ease_out = 'Constant'
+config.default_cursor_style = "BlinkingBar"
+config.cursor_blink_rate = 500
 
 -- CRÍTICO: Desabilita otimizações que causam flicker
 config.force_reverse_video_cursor = false
