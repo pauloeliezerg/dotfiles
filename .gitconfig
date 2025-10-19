@@ -1,0 +1,9 @@
+[user]
+	name = pauloeliezerg
+	email = pauloeliezerg@gmail.com
+[core]
+	editor = codium --wait
+[init]
+	defaultBranch = main
+[url "git@github.com:"]
+	insteadOf = https://github.com/
