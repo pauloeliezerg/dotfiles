@@ -11,69 +11,49 @@ config.default_prog = { '/bin/zsh' }
 
 -- ===== CORES =====
 config.colors = {
-  foreground = "#d7dae0",
-  background = "#16191d",
+  foreground = '#d7dae0',
+  background = '#16191d',
   
-  cursor_bg = "#528bff",
+  cursor_bg = '#528bff',
   cursor_fg = 'rgba(255, 255, 255, 0.8)',
-  cursor_border = "#16191d",
+  cursor_border = 'rgba(22, 25, 29, 0.8)',
   
-  selection_fg = "#abb2bf",
+  selection_fg = '#abb2bf',
   selection_bg = 'rgba(171, 178, 191, 0.2)',
   
-  scrollbar_thumb = 'rgba(116, 125, 145, 0.50)',
-  split = "#3e4451",
+  scrollbar_thumb = 'rgba(79, 86, 102, 0.2)',
+  split = 'rgba(171, 178, 191, 0.2)',
   
   ansi = {
-    "#3f4451",
-    "#e05561",
-    "#8cc265",
-    "#d18f52",
-    "#4aa5f0",
-    "#c162de",
-    "#42b3c2",
-    "#d7dae0",
+    '#3f4451',
+    '#e05561',
+    '#8cc265',
+    '#d18f52',
+    '#4aa5f0',
+    '#c162de',
+    '#42b3c2',
+    '#d7dae0',
   },
   
   brights = {
-    "#4f5666",
-    "#ff616e",
-    "#a5e075",
-    "#f0a45d",
-    "#4dc4ff",
-    "#de73ff",
-    "#4cd1e0",
-    "#e6e6e6",
+    '#4f5666',
+    '#ff616e',
+    '#a5e075',
+    '#f0a45d',
+    '#4dc4ff',
+    '#de73ff',
+    '#4cd1e0',
+    '#e6e6e6',
   },
 
-  indexed = {[136] = "#af8700"},
-  compose_cursor = "#528bff",
-  
-  tab_bar = {
-    background = "#16191d",
-    active_tab = {
-      bg_color = "#23272e",
-      fg_color = "#dcdcdc",
-      intensity = "Normal",
-      underline = "None",
-      italic = false,
-      strikethrough = false,
-    },
-    inactive_tab = {
-      bg_color = "#16191d",
-      fg_color = 'rgba(220, 220, 220, 0.25)',
-    },
-    inactive_tab_hover = {
-      bg_color = "#323842",
-      fg_color = 'rgba(220, 220, 220, 0.25)',
-    },
-  },
+  indexed = {[136] = '#af8700'},
+  compose_cursor = '#528bff',
 }
 
 -- ===== WINDOW FRAME =====
 config.window_frame = {
-  active_titlebar_bg = "#16191d",
-  inactive_titlebar_bg = "#16191d",
+  active_titlebar_bg = '#16191d',
+  inactive_titlebar_bg = '#16191d',
   
   font = wezterm.font('JetBrains Mono'),
   font_size = 12.0,
@@ -94,7 +74,7 @@ config.font_size = 13.0
 config.line_height = 1.5
 
 -- ===== JANELA =====
-config.window_decorations = "NONE"
+config.window_decorations = 'NONE'
 config.enable_tab_bar = false
 config.window_background_opacity = 0.85
 
@@ -106,7 +86,7 @@ config.window_padding = {
 }
 
 -- ===== SCROLL =====
-config.enable_scroll_bar = false
+config.enable_scroll_bar = true
 config.scrollback_lines = 10000
 config.scroll_to_bottom_on_input = true
 
@@ -127,9 +107,8 @@ config.set_environment_variables = {
 }
 
 -- ===== CURSOR =====
--- Cursor sólido, sem blink
--- config.default_cursor_style = "BlinkingBar"
--- config.cursor_blink_rate = 500
+config.default_cursor_style = 'BlinkingBar'
+config.cursor_blink_rate = 500
 
 -- CRÍTICO: Desabilita otimizações que causam flicker
 config.force_reverse_video_cursor = false
@@ -145,8 +124,8 @@ config.webgpu_preferred_adapter = {
   vendor = 4098,
 }
 
-config.front_end = "WebGpu"
-config.webgpu_power_preference = "HighPerformance"
+config.front_end = 'WebGpu'
+config.webgpu_power_preference = 'HighPerformance'
 config.max_fps = 60
 config.animation_fps = 1
 
@@ -170,15 +149,15 @@ config.mouse_bindings = {
 -- ===== KEYBINDINGS =====
 config.keys = {
   {
-    key = "l",
-    mods = "CTRL",
+    key = 'l',
+    mods = 'CTRL',
     action = wezterm.action_callback(function(window, pane)
       if pane:is_alt_screen_active() then
         return
       end
       window:perform_action(wezterm.action.ScrollToBottom, pane)
       local height = pane:get_dimensions().viewport_rows
-      local blank_viewport = string.rep("\n", height)
+      local blank_viewport = string.rep('\n', height)
       wezterm.sleep_ms(25)
       pane:inject_output(blank_viewport)
       pane:inject_output('\x1b[H\x1b[2J')
