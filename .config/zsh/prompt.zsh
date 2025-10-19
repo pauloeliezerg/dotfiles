@@ -1,5 +1,5 @@
 # ================================================================
-# ~/.config/zsh/prompt.zsh - Configuração do prompt (Otimizado)
+# prompt.zsh - Configuração do prompt (Otimizado v2)
 # ================================================================
 
 setopt PROMPT_SUBST
@@ -15,65 +15,27 @@ typeset -g _cache_pwd=""
 typeset -g _skip_next_duration=false
 typeset -g _last_exit_status=0
 typeset -g _show_exit_color=false
-typeset -g _prompt_initialized=false
-
-# ===== INICIALIZAÇÃO =====
-_initialize_prompt() {
-  [[ $_prompt_initialized == true ]] && return
-  _update_git_info
-  _update_nodejs_info
-  _update_python_info
-  _cache_pwd="$PWD"
-  _prompt_initialized=true
-}
 
 # ===== HOOKS DO PROMPT =====
 autoload -Uz add-zle-hook-widget add-zsh-hook
 
-# Gerencia cursor e estado
-_prompt_zle_line_init() {
-  # printf '\e[2 q'  # Cursor sólido
-}
-
-_prompt_zle_line_finish() {
-  printf '\e[?25l'  # Esconde cursor
-  
-  if [[ -z "$BUFFER" ]]; then
-    _skip_next_duration=true
-  else
-    _skip_next_duration=false
-  fi
-}
-
-# Registra hooks apenas se a função estiver disponível
+# Gerencia cursor
 if (( $+functions[add-zle-hook-widget] )); then
-  add-zle-hook-widget zle-line-init _prompt_zle_line_init
+  _prompt_zle_line_finish() {
+    [[ -z "$BUFFER" ]] && _skip_next_duration=true || _skip_next_duration=false
+  }
   add-zle-hook-widget zle-line-finish _prompt_zle_line_finish
 fi
 
-# Captura exit status imediatamente
-_prompt_capture_exit_status() {
-  _last_exit_status=$?
-}
-
-add-zsh-hook precmd _prompt_capture_exit_status
-
-# Timer de comando
+# Timer e captura de exit status
 preexec() {
   _cmd_start=$(($(date +%s%N)/1000000))
-  
-  # Detecta comando 'clear'
   [[ "$1" =~ ^clear($| ) ]] && _skip_next_duration=true || _skip_next_duration=false
-  
-  printf '\e[?25h'  # Mostra cursor
 }
 
-# Atualiza informações após comando
 _prompt_precmd_handler() {
-  printf '\e[?25l'  # Esconde cursor
-  
+  _last_exit_status=$?
   _show_exit_color=true
-  _initialize_prompt
   
   local needs_update=false
   
@@ -104,10 +66,7 @@ _prompt_precmd_handler() {
   fi
   
   # Imprime duração se necessário
-  if [[ $_skip_next_duration == false && -n "$_cmd_duration" ]]; then
-    echo "\e[33m⏱  $_cmd_duration\e[0m"
-  fi
-  
+  [[ $_skip_next_duration == false && -n "$_cmd_duration" ]] && echo "\e[33m⏱  $_cmd_duration\e[0m"
   [[ $_skip_next_duration == true ]] && _skip_next_duration=false
   
   # Atualiza caches apenas se necessário
@@ -117,9 +76,6 @@ _prompt_precmd_handler() {
     _update_python_info
     _cache_pwd="$PWD"
   fi
-  
-  sleep 0.005  # Delay mínimo para render
-  printf '\e[?25h'  # Mostra cursor
 }
 
 add-zsh-hook precmd _prompt_precmd_handler
@@ -132,12 +88,16 @@ _update_git_info() {
   local branch=$(git symbolic-ref --short HEAD 2>/dev/null)
   [[ -z "$branch" ]] && return
   
+  # Usa git status --porcelain para ser mais eficiente
+  local status_output=$(git status --porcelain 2>/dev/null)
   local git_status=""
   
-  if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
-    git_status=" %F{yellow}[*]%f"
-  elif [[ -n $(git ls-files --others --exclude-standard 2>/dev/null) ]]; then
-    git_status=" %F{yellow}[?]%f"
+  if [[ -n "$status_output" ]]; then
+    if [[ "$status_output" =~ ^[MADRCU\ ][MADRCU\ ] ]]; then
+      git_status=" %F{yellow}[*]%f"
+    elif [[ "$status_output" =~ ^\?\? ]]; then
+      git_status=" %F{yellow}[?]%f"
+    fi
   fi
   
   _git_info_cache=" %F{magenta} %F{magenta}$branch%f$git_status"
@@ -187,4 +147,3 @@ setopt prompt_cr prompt_sp
 typeset -g PROMPT_EOL_MARK=''
 setopt transient_rprompt 2>/dev/null
 KEYTIMEOUT=1
-print -n '\e[r'  # Força região de scroll completa
