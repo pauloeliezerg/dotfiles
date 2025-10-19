@@ -16,7 +16,7 @@ config.colors = {
   
   cursor_bg = '#528bff',
   cursor_fg = 'rgba(255, 255, 255, 0.8)',
-  cursor_border = 'rgba(22, 25, 29, 0.8)',
+  cursor_border = 'rgba(33, 38, 44, 0.2)',
   
   selection_fg = '#abb2bf',
   selection_bg = 'rgba(171, 178, 191, 0.2)',
